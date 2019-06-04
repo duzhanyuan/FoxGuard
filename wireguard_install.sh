@@ -59,7 +59,7 @@ config_client(){
 cat > /etc/wireguard/client.conf <<-EOF
 [Interface]
 PrivateKey = $c1
-Address = 10.0.0.2/24 
+Address = 11.0.0.2/24 
 DNS = 8.8.8.8
 MTU = 1420
 
@@ -106,7 +106,7 @@ wireguard_install(){
 cat > /etc/wireguard/wg0.conf <<-EOF
 [Interface]
 PrivateKey = $s1
-Address = 10.0.0.1/24 
+Address = 11.0.0.1/24 
 PostUp   = echo 1 > /proc/sys/net/ipv4/ip_forward; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $eth -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $eth -j MASQUERADE
 ListenPort = $port
@@ -115,7 +115,7 @@ MTU = 1420
 
 [Peer]
 PublicKey = $c2
-AllowedIPs = 10.0.0.2/32
+AllowedIPs = 11.0.0.2/32
 EOF
 
     config_client
@@ -134,14 +134,14 @@ add_user(){
     ipnum=$(grep Allowed /etc/wireguard/wg0.conf | tail -1 | awk -F '[ ./]' '{print $6}')
     newnum=$((10#${ipnum}+1))
     sed -i 's%^PrivateKey.*$%'"PrivateKey = $(cat temprikey)"'%' $newname.conf
-    sed -i 's%^Address.*$%'"Address = 10.0.0.$newnum\/24"'%' $newname.conf
+    sed -i 's%^Address.*$%'"Address = 11.0.0.$newnum\/24"'%' $newname.conf
 
 cat >> /etc/wireguard/wg0.conf <<-EOF
 [Peer]
 PublicKey = $(cat tempubkey)
-AllowedIPs = 10.0.0.$newnum/32
+AllowedIPs = 11.0.0.$newnum/32
 EOF
-    wg set wg0 peer $(cat tempubkey) allowed-ips 10.0.0.$newnum/32
+    wg set wg0 peer $(cat tempubkey) allowed-ips 11.0.0.$newnum/32
     echo -e "\033[37;41m添加完成，文件：/etc/wireguard/$newname.conf\033[0m"
     rm -f temprikey tempubkey
 }
